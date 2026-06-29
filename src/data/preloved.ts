@@ -1,0 +1,178 @@
+export interface Product {
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  seller: string;
+  location: string;
+  timeAgo: string;
+  condition: string;
+  description: string;
+  bg: string;
+  iconColor: string;
+  tags: string[];
+}
+
+export interface ChatMessage {
+  from: 'me' | 'them';
+  text: string;
+  time: string;
+}
+
+export interface ChatThread {
+  id: number;
+  name: string;
+  product: string;
+  lastMsg: string;
+  time: string;
+  unread: number;
+  messages: ChatMessage[];
+}
+
+export const products: Product[] = [
+  {
+    id: 1,
+    name: 'Kemeja Flanel Kotak',
+    category: 'Pakaian',
+    price: 75000,
+    seller: 'Nina R.',
+    location: 'Jakarta Selatan',
+    timeAgo: '2 jam lalu',
+    condition: '9/10',
+    description: 'Kemeja flanel motif kotak warna earth tone. Bahan tebal dan nyaman, cocok untuk casual day. Ukuran M, panjang lengan 60cm. Hanya dipakai 3–4 kali, kondisi masih sangat bagus.',
+    bg: '#F1E2CC',
+    iconColor: '#C68B59',
+    tags: ['M', 'Casual', 'Unisex'],
+  },
+  {
+    id: 2,
+    name: 'Tas Selempang Kulit',
+    category: 'Tas',
+    price: 185000,
+    seller: 'Budi S.',
+    location: 'Bandung',
+    timeAgo: '5 jam lalu',
+    condition: '8/10',
+    description: 'Tas selempang bahan kulit sintetis cokelat tua. Terdapat satu ruang utama dan dua kantong kecil. Ukuran 25x18cm, sangat cocok untuk outing harian maupun ke kantor.',
+    bg: '#E7EEE3',
+    iconColor: '#3F6048',
+    tags: ['Unisex', 'Office', 'Casual'],
+  },
+  {
+    id: 3,
+    name: 'Sneakers Putih Bersih',
+    category: 'Sepatu',
+    price: 230000,
+    seller: 'Citra A.',
+    location: 'Surabaya',
+    timeAgo: '1 hari lalu',
+    condition: '8/10',
+    description: 'Sneakers warna putih full, clean look. Ukuran 39, kondisi masih sangat bersih, sole belum tipis. Cocok dipasangkan dengan berbagai outfit casual maupun semi-formal.',
+    bg: '#EDE8F5',
+    iconColor: '#7B5EA7',
+    tags: ['39', 'Unisex', 'Casual'],
+  },
+  {
+    id: 4,
+    name: 'Kacamata Vintage Round',
+    category: 'Aksesoris',
+    price: 55000,
+    seller: 'Raka M.',
+    location: 'Yogyakarta',
+    timeAgo: '1 hari lalu',
+    condition: '9/10',
+    description: 'Kacamata frame bulat vintage, warna tortoise. Lensa jernih tanpa goresan. Cocok untuk bergaya retro atau daily casual. Dilengkapi pouch kulit ori.',
+    bg: '#F5EDDE',
+    iconColor: '#A0522D',
+    tags: ['Vintage', 'Unisex', 'Retro'],
+  },
+  {
+    id: 5,
+    name: 'Denim Jacket Vintage',
+    category: 'Pakaian',
+    price: 145000,
+    seller: 'Sari N.',
+    location: 'Jakarta Barat',
+    timeAgo: '2 hari lalu',
+    condition: '7/10',
+    description: 'Jaket denim vintage berwarna biru medium wash. Ukuran L, sudah ada natural fade yang membuat tampilan lebih keren. Ada kantong dada dan dua saku samping.',
+    bg: '#DDEAF5',
+    iconColor: '#4A6FA5',
+    tags: ['L', 'Vintage', 'Casual'],
+  },
+  {
+    id: 6,
+    name: 'Hoodie Oversized Abu',
+    category: 'Pakaian',
+    price: 95000,
+    seller: 'Budi S.',
+    location: 'Bandung',
+    timeAgo: '3 hari lalu',
+    condition: '9/10',
+    description: 'Hoodie oversized warna abu-abu misty. Bahan tebal 320gsm, lembut dan hangat. Ukuran XL, muat untuk badan L–XL. Dipakai kurang dari 5 kali, masih sangat fresh.',
+    bg: '#E8E8E8',
+    iconColor: '#666666',
+    tags: ['XL', 'Comfy', 'Oversize'],
+  },
+];
+
+export const chatThreads: ChatThread[] = [
+  {
+    id: 1,
+    name: 'Nina R.',
+    product: 'Kemeja Flanel Kotak',
+    lastMsg: 'Apakah masih ada?',
+    time: '10.30',
+    unread: 2,
+    messages: [
+      { from: 'them', text: 'Halo, apakah kemeja flanel nya masih available?', time: '10.15' },
+      { from: 'me', text: 'Masih ada, kondisi bagus. Ada yang mau ditanyakan?', time: '10.20' },
+      { from: 'them', text: 'Ukurannya kira-kira muat untuk bahu 44?', time: '10.28' },
+      { from: 'them', text: 'Apakah masih ada?', time: '10.30' },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Budi S.',
+    product: 'Tas Selempang Kulit',
+    lastMsg: 'Oke, terima kasih!',
+    time: '09.15',
+    unread: 0,
+    messages: [
+      { from: 'them', text: 'Tasnya masih ada kak?', time: '08.40' },
+      { from: 'me', text: 'Masih! Mau lihat foto detail?', time: '08.45' },
+      { from: 'them', text: 'Boleh dong kak', time: '08.46' },
+      { from: 'me', text: 'Ini kondisi masih oke banget, hampir baru', time: '08.55' },
+      { from: 'them', text: 'Oke, terima kasih!', time: '09.15' },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Citra A.',
+    product: 'Sneakers Putih',
+    lastMsg: 'Barang sudah dikirim ya',
+    time: 'Kemarin',
+    unread: 0,
+    messages: [
+      { from: 'me', text: 'Barang sudah dikirim ya, nomor resi: JNE1234567890', time: '14.30' },
+      { from: 'them', text: 'Siap kak, makasih banyak!', time: '14.45' },
+    ],
+  },
+  {
+    id: 4,
+    name: 'Raka M.',
+    product: 'Kacamata Vintage',
+    lastMsg: 'Baik, ditunggu',
+    time: 'Kemarin',
+    unread: 0,
+    messages: [
+      { from: 'them', text: 'Bisa COD ga kak?', time: '16.00' },
+      { from: 'me', text: 'Maaf, saya hanya melayani pengiriman', time: '16.05' },
+      { from: 'them', text: 'Baik, ditunggu ya kak', time: '16.07' },
+      { from: 'them', text: 'Baik, ditunggu', time: '16.10' },
+    ],
+  },
+];
+
+export const formatRupiah = (n: number) =>
+  'Rp ' + n.toLocaleString('id-ID');
