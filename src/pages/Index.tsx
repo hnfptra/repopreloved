@@ -10,20 +10,23 @@ import ChatConversationScreen from '../screens/ChatConversationScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import AkunScreen from '../screens/AkunScreen';
 import OrderSuccessScreen from '../screens/OrderSuccessScreen';
+import SearchScreen from '../screens/SearchScreen'; // Import SearchScreen
 import React from 'react';
 
-type NavigateExtra = { productId?: number; chatId?: number; from?: number };
+type NavigateExtra = { productId?: number; chatId?: number; from?: number; searchQuery?: string };
 
 export default function Index() {
   const [currentScreen, setCurrentScreen] = useState(1);
   const [selectedProductId, setSelectedProductId] = useState(1);
   const [selectedChatId, setSelectedChatId] = useState(1);
   const [prevScreen, setPrevScreen] = useState(2);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const navigate = (screen: number, extra?: NavigateExtra) => {
     setPrevScreen(currentScreen);
     if (extra?.productId !== undefined) setSelectedProductId(extra.productId);
     if (extra?.chatId !== undefined) setSelectedChatId(extra.chatId);
+    if (extra?.searchQuery !== undefined) setSearchQuery(extra.searchQuery);
     setCurrentScreen(screen);
   };
 
@@ -49,6 +52,8 @@ export default function Index() {
         return <AkunScreen onNavigate={navigate} />;
       case 10:
         return <OrderSuccessScreen onNavigate={navigate} productId={selectedProductId} />;
+      case 11: // Screen Search
+        return <SearchScreen onNavigate={navigate} searchQuery={searchQuery} />;
       default:
         return <SplashScreen onNavigate={navigate} />;
     }

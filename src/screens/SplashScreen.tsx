@@ -18,7 +18,7 @@ export default function SplashScreen({ onNavigate }: SplashScreenProps) {
       </h2>
       <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15.5, color: '#8A8475', lineHeight: 1.5, margin: 0 }}>
         <strong style={{ color: '#232A22', fontWeight: 600 }}>good for you,</strong>
-        <br />good for bumi.
+        <br />good for earth.
       </p>
       <div style={{ display: 'flex', gap: 6, margin: '34px 0 26px' }}>
         <span style={{ width: 18, height: 6, borderRadius: 4, background: '#2C4533', display: 'block' }}></span>

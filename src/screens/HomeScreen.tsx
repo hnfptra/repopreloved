@@ -28,6 +28,7 @@ const cats = ['Semua', 'Pakaian', 'Tas', 'Sepatu', 'Aksesoris'];
 export default function HomeScreen({ onNavigate }: HomeScreenProps) {
   const [activeCategory, setActiveCategory] = useState('Semua');
   const [liked, setLiked] = useState<Set<number>>(new Set());
+  const [searchInput, setSearchInput] = useState('');
 
   const filteredProducts = activeCategory === 'Semua'
     ? products
@@ -42,14 +43,43 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
     });
   };
 
+  const handleSearch = () => {
+    if (searchInput.trim()) {
+      onNavigate(11, { searchQuery: searchInput });
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="screen-enter flex flex-col flex-1 min-h-0" style={{ background: '#F7F3EC' }}>
       <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: '12px 14px 14px' }}>
-        {/* Search + Bell - Diperkecil */}
+        {/* Search + Bell */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #DED5C3', borderRadius: 999, padding: '8px 14px', color: '#8A8475', fontSize: 12, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <div 
+            onClick={() => onNavigate(11)}
+            style={{ 
+              flex: 1, 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 6, 
+              background: '#fff', 
+              border: '1px solid #DED5C3', 
+              borderRadius: 999, 
+              padding: '8px 14px', 
+              color: '#8A8475', 
+              fontSize: 12, 
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              cursor: 'pointer',
+            }}
+          >
             <svg width="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
-              <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+              <circle cx="11" cy="11" r="7"/>
+              <path d="M21 21l-4.3-4.3"/>
             </svg>
             Cari barang preloved
           </div>
@@ -61,7 +91,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
           </div>
         </div>
 
-        {/* Banner - Diperkecil */}
+        {/* Banner */}
         <div style={{ background: 'linear-gradient(135deg, #2C4533, #3F6048)', borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#fff', marginBottom: 14 }}>
           <div>
             <p style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 500, margin: '0 0 4px', lineHeight: 1.3 }}>
@@ -78,7 +108,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
           </svg>
         </div>
 
-        {/* Categories - Diperkecil */}
+        {/* Categories */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 4, marginBottom: 16 }}>
           {cats.map(cat => (
             <div key={cat} onClick={() => { setActiveCategory(cat); if (cat !== 'Semua') onNavigate(3); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
@@ -93,7 +123,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
           ))}
         </div>
 
-        {/* Products - Diperkecil */}
+        {/* Products */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
           <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 14, fontWeight: 600, margin: 0, color: '#2C4533' }}>
             {activeCategory === 'Semua' ? 'Rekomendasi untukmu' : activeCategory}
