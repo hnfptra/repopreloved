@@ -5,11 +5,9 @@ import {
   LogOut,
   MapPin,
   Package,
-  Settings,
   ShieldCheck,
   ShoppingBag,
   Star,
-  User,
 } from 'lucide-react';
 import BottomNav from '../components/preloved/BottomNav';
 import ScreenHeader from '../components/preloved/ScreenHeader';
@@ -24,12 +22,6 @@ const quickStats = [
   { label: 'Dijual', value: '12', icon: Package },
   { label: 'Dibeli', value: '5', icon: ShoppingBag },
   { label: 'Favorit', value: '3', icon: Heart },
-];
-
-const accountActions = [
-  { label: 'Profil', caption: 'Data akun dan identitas toko', icon: User, color: '#2C4533', bg: '#E7EEE3' },
-  { label: 'Pengaturan', caption: 'Privasi, notifikasi, dan keamanan', icon: Settings, color: '#C68B59', bg: '#F7E7D6' },
-  { label: 'Logout', caption: 'Keluar dari akun Preloved', icon: LogOut, color: '#C1543C', bg: '#FBE1DA' },
 ];
 
 const profileDetails = [
@@ -127,53 +119,47 @@ export default function Profilsaya({ onNavigate }: ProfilsayaProps) {
           </div>
 
           <div style={{ padding: '8px 0' }}>
-            {accountActions.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.label}
-                  type="button"
-                  style={{
-                    width: '100%',
-                    border: 'none',
-                    borderBottom: index < accountActions.length - 1 ? '1px solid #F0E8DC' : 'none',
-                    background: 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 11,
-                    padding: '11px 14px',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 10,
-                      background: item.bg,
-                      color: item.color,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Icon size={18} strokeWidth={2.2} />
-                  </span>
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: 'block', color: '#232A22', fontSize: 13.5, fontWeight: 800 }}>
-                      {item.label}
-                    </span>
-                    <span style={{ display: 'block', color: '#8A8475', fontSize: 11.5, marginTop: 2, lineHeight: 1.35 }}>
-                      {item.caption}
-                    </span>
-                  </span>
-                  <ChevronRight size={16} color={item.color} strokeWidth={2.3} />
-                </button>
-              );
-            })}
+            <button
+              type="button"
+              onClick={() => onNavigate(1)}
+              style={{
+                width: '100%',
+                border: 'none',
+                background: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 11,
+                padding: '11px 14px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+              }}
+            >
+              <span
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 10,
+                  background: '#FBE1DA',
+                  color: '#C1543C',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <LogOut size={18} strokeWidth={2.2} />
+              </span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: 'block', color: '#232A22', fontSize: 13.5, fontWeight: 800 }}>
+                  Logout
+                </span>
+                <span style={{ display: 'block', color: '#8A8475', fontSize: 11.5, marginTop: 2, lineHeight: 1.35 }}>
+                  Keluar dari akun Preloved
+                </span>
+              </span>
+              <ChevronRight size={16} color="#C1543C" strokeWidth={2.3} />
+            </button>
           </div>
         </section>
 
