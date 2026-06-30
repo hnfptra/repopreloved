@@ -1,17 +1,19 @@
 // src/screens/NotificationScreen.tsx
 import React, { useState } from 'react';
-import { notifications, Notification } from '../data/notifications';
+import { notifications, Notification, markNotificationsAsReadByChatId, markNotificationsAsReadByProductId } from '../data/notifications';
 
 interface NotificationScreenProps {
-  onNavigate: (screen: number) => void;
+  onNavigate: (screen: number, extra?: any) => void;
 }
 
 const NotificationScreen: React.FC<NotificationScreenProps> = ({ onNavigate }) => {
-  const [notifList, setNotifList] = useState(notifications);
+  const [notifList, setNotifList] = useState([...notifications]);
 
   const markAllAsRead = () => {
     const updatedList = notifList.map(n => ({ ...n, isRead: true }));
     setNotifList(updatedList);
+    // Update data global
+    notifications.forEach(n => { n.isRead = true; });
   };
 
   const markAsRead = (id: number) => {
@@ -19,6 +21,27 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({ onNavigate }) =
       n.id === id ? { ...n, isRead: true } : n
     );
     setNotifList(updatedList);
+    // Update data global
+    const notif = notifications.find(n => n.id === id);
+    if (notif) notif.isRead = true;
+  };
+
+  const handleNotificationClick = (notification: Notification) => {
+    markAsRead(notification.id);
+    
+    // Jika notifikasi memiliki chatId, navigasi ke chat dan tandai semua notifikasi dengan chatId yang sama
+    if (notification.chatId) {
+      markNotificationsAsReadByChatId(notification.chatId);
+      // Update list
+      const updatedList = notifications.map(n => ({ ...n }));
+      setNotifList(updatedList);
+      onNavigate(61, { chatId: notification.chatId });
+    } else if (notification.productId) {
+      markNotificationsAsReadByProductId(notification.productId);
+      const updatedList = notifications.map(n => ({ ...n }));
+      setNotifList(updatedList);
+      onNavigate(4, { productId: notification.productId });
+    }
   };
 
   const getTypeColor = (type: string) => {
@@ -51,10 +74,12 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({ onNavigate }) =
     }
   };
 
+  // Hitung ulang unread count
+  const unreadCount = notifList.filter(n => !n.isRead).length;
+
   return (
     <div className="screen-enter flex flex-col flex-1 min-h-0" style={{ background: '#F7F3EC' }}>
       <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: '16px 14px 14px' }}>
-        {/* Header dengan tombol Back */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
           <button
             onClick={() => onNavigate(2)}
@@ -83,9 +108,9 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({ onNavigate }) =
             color: '#2C4533', 
             margin: 0 
           }}>
-            Notifikasi
+            Pesan Masuk
           </h2>
-          {notifList.some(n => !n.isRead) && (
+          {unreadCount > 0 && (
             <button
               onClick={markAllAsRead}
               style={{
@@ -103,7 +128,6 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({ onNavigate }) =
           )}
         </div>
 
-        {/* Daftar Notifikasi */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {notifList.length === 0 ? (
             <div style={{ 
@@ -120,7 +144,7 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({ onNavigate }) =
             notifList.map((notif) => (
               <div
                 key={notif.id}
-                onClick={() => markAsRead(notif.id)}
+                onClick={() => handleNotificationClick(notif)}
                 style={{
                   display: 'flex',
                   alignItems: 'flex-start',
@@ -139,7 +163,6 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({ onNavigate }) =
                   e.currentTarget.style.borderColor = '#DED5C3';
                 }}
               >
-                {/* Icon Type */}
                 <div style={{
                   width: 36,
                   height: 36,
@@ -154,7 +177,6 @@ const NotificationScreen: React.FC<NotificationScreenProps> = ({ onNavigate }) =
                   {getTypeIcon(notif.type)}
                 </div>
 
-                {/* Konten */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

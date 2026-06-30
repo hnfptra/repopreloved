@@ -27,6 +27,8 @@ export interface ChatThread {
   lastMsg: string;
   time: string;
   unread: number;
+  isArchived: boolean;  // TAMBAHKAN
+  isMuted: boolean;    // TAMBAHKAN
   messages: ChatMessage[];
 }
 
@@ -171,6 +173,48 @@ export const products: Product[] = [
     iconColor: '#2C4533',
     tags: ['Unisex', 'Retro', 'Classic'],
   },
+  {
+    id: 11,
+    name: 'Headphone Bluetooth',
+    category: 'Elektronik',
+    price: 250000,
+    seller: 'Tech Store',
+    location: 'Jakarta Pusat',
+    timeAgo: '2 hari lalu',
+    condition: '9/10',
+    description: 'Headphone Bluetooth premium dengan noise cancellation. Baterai tahan 20 jam, suara jernih dan bass yang powerful. Cocok untuk musik dan meeting online.',
+    bg: '#DDEAF5',
+    iconColor: '#4A6FA5',
+    tags: ['Wireless', 'Premium', 'Bluetooth'],
+  },
+  {
+    id: 12,
+    name: 'Smartwatch Series 5',
+    category: 'Elektronik',
+    price: 350000,
+    seller: 'Gadget Hub',
+    location: 'Tangerang',
+    timeAgo: '3 hari lalu',
+    condition: '8/10',
+    description: 'Smartwatch dengan fitur lengkap: detak jantung, step counter, notifikasi, dan tahan air. Layar AMOLED 1.4 inch, baterai tahan 3 hari.',
+    bg: '#C5D4D4',
+    iconColor: '#2C4533',
+    tags: ['Smartwatch', 'Fitness', 'AMOLED'],
+  },
+  {
+    id: 13,
+    name: 'Powerbank 20000mAh',
+    category: 'Elektronik',
+    price: 120000,
+    seller: 'Battery Center',
+    location: 'Depok',
+    timeAgo: '1 minggu lalu',
+    condition: '9/10',
+    description: 'Powerbank kapasitas 20000mAh dengan fast charging. Bisa charge HP hingga 4-5 kali. Dilengkapi dengan 2 port USB dan 1 port Type-C.',
+    bg: '#E8E0D8',
+    iconColor: '#2C4533',
+    tags: ['Fast Charging', 'Portable', '20W'],
+  },
 ];
 
 export const chatThreads: ChatThread[] = [
@@ -181,6 +225,8 @@ export const chatThreads: ChatThread[] = [
     lastMsg: 'Apakah masih ada?',
     time: '10.30',
     unread: 2,
+    isArchived: false,
+    isMuted: false,
     messages: [
       { from: 'them', text: 'Halo, apakah kemeja flanel nya masih available?', time: '10.15' },
       { from: 'me', text: 'Masih ada, kondisi bagus. Ada yang mau ditanyakan?', time: '10.20' },
@@ -195,6 +241,8 @@ export const chatThreads: ChatThread[] = [
     lastMsg: 'Oke, terima kasih!',
     time: '09.15',
     unread: 0,
+    isArchived: false,
+    isMuted: false,
     messages: [
       { from: 'them', text: 'Tasnya masih ada kak?', time: '08.40' },
       { from: 'me', text: 'Masih! Mau lihat foto detail?', time: '08.45' },
@@ -210,6 +258,8 @@ export const chatThreads: ChatThread[] = [
     lastMsg: 'Barang sudah dikirim ya',
     time: 'Kemarin',
     unread: 0,
+    isArchived: false,
+    isMuted: false,
     messages: [
       { from: 'me', text: 'Barang sudah dikirim ya, nomor resi: JNE1234567890', time: '14.30' },
       { from: 'them', text: 'Siap kak, makasih banyak!', time: '14.45' },
@@ -222,6 +272,8 @@ export const chatThreads: ChatThread[] = [
     lastMsg: 'Baik, ditunggu',
     time: 'Kemarin',
     unread: 0,
+    isArchived: false,
+    isMuted: false,
     messages: [
       { from: 'them', text: 'Bisa COD ga kak?', time: '16.00' },
       { from: 'me', text: 'Maaf, saya hanya melayani pengiriman', time: '16.05' },

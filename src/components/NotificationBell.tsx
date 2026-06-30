@@ -1,20 +1,27 @@
 // src/components/NotificationBell.tsx
 import React, { useState, useEffect, useRef } from 'react';
-import { notifications, getUnreadCount, Notification } from '../data/notifications';
+import { notifications, getUnreadCount, Notification, markNotificationsAsReadByChatId } from '../data/notifications';
 
 interface NotificationBellProps {
-  onNavigate?: (screen: number) => void;
+  onNavigate?: (screen: number, extra?: any) => void;
 }
 
 const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(getUnreadCount());
-  const [notifList, setNotifList] = useState(notifications);
+  const [notifList, setNotifList] = useState([...notifications]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Update unread count secara periodik
   useEffect(() => {
-    setUnreadCount(notifList.filter(n => !n.isRead).length);
-  }, [notifList]);
+    const updateUnread = () => {
+      setUnreadCount(getUnreadCount());
+      setNotifList([...notifications]);
+    };
+    
+    const interval = setInterval(updateUnread, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -31,39 +38,35 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }) => {
   };
 
   const handleNotificationClick = (notification: Notification) => {
-    const updatedList = notifList.map(n => 
-      n.id === notification.id ? { ...n, isRead: true } : n
-    );
-    setNotifList(updatedList);
-    setUnreadCount(updatedList.filter(n => !n.isRead).length);
+    const notif = notifications.find(n => n.id === notification.id);
+    if (notif) notif.isRead = true;
+    
+    setUnreadCount(getUnreadCount());
+    setNotifList([...notifications]);
     setIsOpen(false);
     
-    // Navigasi ke halaman notifikasi
     if (onNavigate) {
-      onNavigate(12);
+      if (notification.chatId) {
+        markNotificationsAsReadByChatId(notification.chatId);
+        onNavigate(61, { chatId: notification.chatId });
+      } else if (notification.productId) {
+        onNavigate(4, { productId: notification.productId });
+      } else {
+        onNavigate(12);
+      }
     }
   };
 
   const markAllAsRead = () => {
-    const updatedList = notifList.map(n => ({ ...n, isRead: true }));
-    setNotifList(updatedList);
+    notifications.forEach(n => { n.isRead = true; });
     setUnreadCount(0);
+    setNotifList([...notifications]);
   };
 
   const handleViewAll = () => {
     setIsOpen(false);
     if (onNavigate) {
       onNavigate(12);
-    }
-  };
-
-  const getIconColor = (type: string) => {
-    switch (type) {
-      case 'order': return '#2C4533';
-      case 'message': return '#3F6048';
-      case 'promo': return '#C68B59';
-      case 'system': return '#8A8475';
-      default: return '#2C4533';
     }
   };
 
@@ -77,8 +80,9 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }) => {
     }
   };
 
-  // Ambil 3 notifikasi terbaru untuk dropdown
-  const recentNotifs = notifList.slice(0, 3);
+  // Ambil 3 notifikasi terbaru yang belum dibaca
+  const recentNotifs = notifList.filter(n => !n.isRead).slice(0, 3);
+  const hasUnread = recentNotifs.length > 0;
 
   return (
     <div style={{ position: 'relative' }} ref={dropdownRef}>
@@ -107,13 +111,11 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }) => {
           e.currentTarget.style.background = '#fff';
         }}
       >
-        {/* Icon Bel */}
         <svg width="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M6 8a6 6 0 0112 0c0 4 1.5 5.5 1.5 6.5H4.5C4.5 13.5 6 12 6 8z"/>
           <path d="M9.5 18a2.5 2.5 0 005 0"/>
         </svg>
 
-        {/* Badge Merah */}
         {unreadCount > 0 && (
           <div
             style={{
@@ -184,10 +186,19 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }) => {
 
           {/* Daftar Notifikasi */}
           <div style={{ maxHeight: 280, overflowY: 'auto' }}>
-            {recentNotifs.length === 0 ? (
-              <div style={{ padding: '30px 16px', textAlign: 'center' }}>
-                <span style={{ fontSize: 32, display: 'block', marginBottom: 8 }}>🔔</span>
-                <p style={{ fontSize: 13, color: '#8A8475' }}>Tidak ada notifikasi</p>
+            {!hasUnread ? (
+              // Tampilan saat tidak ada notifikasi
+              <div style={{ 
+                padding: '30px 16px', 
+                textAlign: 'center',
+              }}>
+                <p style={{ 
+                  fontSize: 13, 
+                  color: '#8A8475',
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                }}>
+                  Tidak ada notifikasi
+                </p>
               </div>
             ) : (
               recentNotifs.map((notif) => (
@@ -201,28 +212,26 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }) => {
                     padding: '10px 16px',
                     borderBottom: '1px solid #F5F2EB',
                     cursor: 'pointer',
-                    background: notif.isRead ? 'transparent' : '#F5F9F0',
+                    background: '#F5F9F0',
                     transition: 'background 0.2s ease',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = '#F0EDE6';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = notif.isRead ? 'transparent' : '#F5F9F0';
+                    e.currentTarget.style.background = '#F5F9F0';
                   }}
                 >
-                  {!notif.isRead && (
-                    <div
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        background: '#E74C3C',
-                        flexShrink: 0,
-                        marginTop: 5,
-                      }}
-                    />
-                  )}
+                  <div
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: '#E74C3C',
+                      flexShrink: 0,
+                      marginTop: 5,
+                    }}
+                  />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}>
                       <span style={{ fontSize: 12, fontWeight: 600, color: '#232A22' }}>
@@ -230,8 +239,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }) => {
                       </span>
                       <span style={{ 
                         fontSize: 8, 
-                        color: getIconColor(notif.type),
-                        background: `${getIconColor(notif.type)}15`,
+                        color: '#2C4533',
+                        background: '#E7EEE3',
                         padding: '1px 6px',
                         borderRadius: 999,
                       }}>
@@ -269,7 +278,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ onNavigate }) => {
                 width: '100%',
               }}
             >
-              Lihat semua notifikasi →
+              Lihat semua pesan masuk →
             </button>
           </div>
         </div>

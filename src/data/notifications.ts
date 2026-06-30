@@ -6,6 +6,8 @@ export interface Notification {
   time: string;
   isRead: boolean;
   type: 'order' | 'message' | 'system' | 'promo';
+  chatId?: number;
+  productId?: number;
 }
 
 export const notifications: Notification[] = [
@@ -16,14 +18,18 @@ export const notifications: Notification[] = [
     time: '5 menit lalu',
     isRead: false,
     type: 'order',
+    chatId: 1,
+    productId: 1,
   },
   {
     id: 2,
     title: 'Pesan Masuk',
-    message: 'Nina R. mengirim pesan tentang produk Sneakers Putih.',
+    message: 'Nina R. mengirim pesan tentang produk Kemeja Flanel Kotak.',
     time: '15 menit lalu',
     isRead: false,
     type: 'message',
+    chatId: 1,
+    productId: 3,
   },
   {
     id: 3,
@@ -32,6 +38,8 @@ export const notifications: Notification[] = [
     time: '1 jam lalu',
     isRead: false,
     type: 'order',
+    chatId: 2,
+    productId: 2,
   },
   {
     id: 4,
@@ -53,4 +61,22 @@ export const notifications: Notification[] = [
 
 export const getUnreadCount = (): number => {
   return notifications.filter(n => !n.isRead).length;
+};
+
+// Fungsi untuk menandai notifikasi berdasarkan chatId sebagai sudah dibaca
+export const markNotificationsAsReadByChatId = (chatId: number): void => {
+  notifications.forEach(n => {
+    if (n.chatId === chatId && !n.isRead) {
+      n.isRead = true;
+    }
+  });
+};
+
+// Fungsi untuk menandai notifikasi berdasarkan productId sebagai sudah dibaca
+export const markNotificationsAsReadByProductId = (productId: number): void => {
+  notifications.forEach(n => {
+    if (n.productId === productId && !n.isRead) {
+      n.isRead = true;
+    }
+  });
 };

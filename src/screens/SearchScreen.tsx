@@ -1,27 +1,13 @@
 // src/screens/SearchScreen.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { products, formatRupiah } from '../data/preloved';
+import { Product } from '../data/preloved';
 
 type NavigateExtra = { productId?: number };
 
 interface SearchScreenProps {
   onNavigate: (screen: number, extra?: NavigateExtra) => void;
   searchQuery?: string;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  seller: string;
-  location: string;
-  timeAgo: string;
-  condition: string;
-  description: string;
-  bg: string;
-  iconColor: string;
-  tags: string[];
 }
 
 const productIcons: Record<string, React.ReactNode> = {
@@ -31,7 +17,6 @@ const productIcons: Record<string, React.ReactNode> = {
   Aksesoris: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>,
 };
 
-// Kata kunci terkait untuk pencarian fleksibel
 const relatedKeywords: Record<string, string[]> = {
   'baju': ['kemeja', 'kaos', 'hoodie', 'jaket', 'dress', 'blouse', 't-shirt'],
   'kemeja': ['kemeja', 'baju', 'kaos', 'shirt', 'blouse'],
@@ -48,101 +33,8 @@ const relatedKeywords: Record<string, string[]> = {
   'elektronik': ['elektronik', 'gadget', 'hp', 'laptop', 'headphone'],
 };
 
-// Kata kunci untuk placeholder bergantian
 const placeholderKeywords = ['Pakaian', 'Tas', 'Sepatu', 'Sandal', 'Aksesoris', 'Elektronik'];
 
-// Daftar saran pencarian (rekomendasi kata kunci)
-const searchSuggestions: Record<string, string[]> = {
-  'baju': [
-    'baju kaos pria',
-    'baju pria',
-    'baju koko pria',
-    'baju couple pasangan',
-    'baju cowok',
-    'baju wanita',
-    'baju wanita korean style',
-    'baju tidur wanita',
-    'baju atasan wanita terbaru',
-    'baju batik pria',
-    'baju kemeja pria'
-  ],
-  'sepatu': [
-    'sepatu pria',
-    'sepatu wanita',
-    'sepatu sneakers',
-    'sepatu olahraga',
-    'sepatu formal',
-    'sepatu kulit',
-    'sepatu casual',
-    'sepatu boots',
-    'sepatu anak',
-    'sepatu terbaru',
-    'sepatu branded'
-  ],
-  'tas': [
-    'tas wanita',
-    'tas pria',
-    'tas kulit',
-    'tas selempang',
-    'tas ransel',
-    'tas tote',
-    'tas branded',
-    'tas backpack',
-    'tas handbag',
-    'tas sling bag',
-    'tas terbaru'
-  ],
-  'sandal': [
-    'sandal pria',
-    'sandal wanita',
-    'sandal kulit',
-    'sandal jepit',
-    'sandal selop',
-    'sandal formal',
-    'sandal casual',
-    'sandal anak',
-    'sandal branded',
-    'sandal terbaru'
-  ],
-  'sendal': [
-    'sendal pria',
-    'sendal wanita',
-    'sendal kulit',
-    'sendal jepit',
-    'sendal selop',
-    'sendal formal',
-    'sendal casual',
-    'sendal anak',
-    'sendal branded',
-    'sendal terbaru'
-  ],
-  'aksesoris': [
-    'kacamata pria',
-    'kacamata wanita',
-    'jam tangan pria',
-    'jam tangan wanita',
-    'gelang pria',
-    'gelang wanita',
-    'kalung pria',
-    'kalung wanita',
-    'aksesoris branded',
-    'aksesoris terbaru'
-  ],
-  'elektronik': [
-    'headphone',
-    'earphone',
-    'charger hp',
-    'powerbank',
-    'kabel data',
-    'speaker bluetooth',
-    'smartwatch',
-    'gadget terbaru',
-    'elektronik murah',
-    'aksesoris hp'
-  ]
-};
-
-// Fungsi untuk mendapatkan produk berdasarkan MULTIPLE keyword dari search history
 const getProductsByHistory = (history: string[]): Product[] => {
   if (!history || history.length === 0) return [];
   
@@ -178,32 +70,6 @@ const getProductsByHistory = (history: string[]): Product[] => {
   return filtered.slice(0, 6);
 };
 
-// Fungsi untuk mendapatkan saran pencarian
-const getSuggestions = (query: string): string[] => {
-  const lowerQuery = query.toLowerCase().trim();
-  if (!lowerQuery) return [];
-  
-  const suggestions: string[] = [];
-  
-  // Cari di searchSuggestions
-  for (const [key, values] of Object.entries(searchSuggestions)) {
-    if (key.includes(lowerQuery) || lowerQuery.includes(key)) {
-      suggestions.push(...values);
-    }
-  }
-  
-  // Tambahkan kata kunci dari relatedKeywords yang mirip
-  for (const [key, values] of Object.entries(relatedKeywords)) {
-    if (key.includes(lowerQuery) || lowerQuery.includes(key)) {
-      suggestions.push(key);
-      suggestions.push(...values.filter(v => v.includes(lowerQuery) || lowerQuery.includes(v)));
-    }
-  }
-  
-  // Hapus duplikat
-  return [...new Set(suggestions)].slice(0, 12);
-};
-
 export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScreenProps) {
   const [search, setSearch] = useState(searchQuery);
   const [searchResults, setSearchResults] = useState<Product[]>([]);
@@ -211,11 +77,9 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showHistory, setShowHistory] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Load search history dari localStorage
   useEffect(() => {
     const saved = localStorage.getItem('searchHistory');
     let history: string[] = [];
@@ -231,12 +95,13 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
     
     if (history.length > 0) {
       setRecommendedProducts(getProductsByHistory(history));
+      setShowHistory(true);
     } else {
       setRecommendedProducts([]);
+      setShowHistory(false);
     }
   }, []);
 
-  // Placeholder bergantian
   useEffect(() => {
     const interval = setInterval(() => {
       setIsTransitioning(true);
@@ -248,20 +113,17 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-focus input
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, []);
 
-  // Handle search
   const handleSearch = (query: string) => {
     const trimmed = query.trim();
-    setShowSuggestions(false);
-    
     if (!trimmed) {
       setSearchResults([]);
+      setShowHistory(true);
       if (searchHistory.length > 0) {
         setRecommendedProducts(getProductsByHistory(searchHistory));
       } else {
@@ -270,12 +132,11 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
       return;
     }
 
-    // Simpan ke history
     const newHistory = [trimmed, ...searchHistory.filter(h => h !== trimmed)].slice(0, 5);
     setSearchHistory(newHistory);
     localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+    setShowHistory(false);
 
-    // Dapatkan kata kunci terkait
     const getRelatedTerms = (term: string): string[] => {
       const lowerTerm = term.toLowerCase();
       const related: string[] = [];
@@ -323,21 +184,8 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
 
   const handleHistoryClick = (historyItem: string) => {
     setSearch(historyItem);
-    setShowSuggestions(false);
-    const filtered = products.filter(p => {
-      const productName = p.name.toLowerCase();
-      const productCategory = p.category.toLowerCase();
-      return productName.includes(historyItem.toLowerCase()) || 
-             productCategory.includes(historyItem.toLowerCase());
-    });
-    setSearchResults(filtered.slice(0, 6));
-    setRecommendedProducts([]);
-  };
-
-  const handleSuggestionClick = (suggestion: string) => {
-    setSearch(suggestion);
-    setShowSuggestions(false);
-    handleSearch(suggestion);
+    setShowHistory(false);
+    handleSearch(historyItem);
   };
 
   const clearHistory = () => {
@@ -345,13 +193,13 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
     localStorage.removeItem('searchHistory');
     setRecommendedProducts([]);
     setSearchResults([]);
+    setShowHistory(false);
   };
 
   const clearSearch = () => {
     setSearch('');
     setSearchResults([]);
-    setSuggestions([]);
-    setShowSuggestions(false);
+    setShowHistory(true);
     if (searchHistory.length > 0) {
       setRecommendedProducts(getProductsByHistory(searchHistory));
     } else {
@@ -362,34 +210,33 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
     }
   };
 
-  const handleInputChange = (value: string) => {
-    setSearch(value);
-    if (!value) {
-      setSearchResults([]);
-      setSuggestions([]);
-      setShowSuggestions(false);
+  const handleInputFocus = () => {
+    if (!search && searchHistory.length > 0) {
+      setShowHistory(true);
       if (searchHistory.length > 0) {
         setRecommendedProducts(getProductsByHistory(searchHistory));
-      } else {
-        setRecommendedProducts([]);
       }
-    } else {
-      // Tampilkan saran
-      const suggestions = getSuggestions(value);
-      setSuggestions(suggestions);
-      setShowSuggestions(suggestions.length > 0);
-      // Hapus hasil sebelumnya
-      setSearchResults([]);
-      setRecommendedProducts([]);
     }
   };
+
+  const handleInputBlur = () => {
+    setTimeout(() => {
+      if (!search) {
+        setShowHistory(false);
+        if (searchHistory.length > 0) {
+          setRecommendedProducts(getProductsByHistory(searchHistory));
+        }
+      }
+    }, 200);
+  };
+
+  const isHistoryVisible = showHistory && searchHistory.length > 0;
 
   return (
     <div className="screen-enter flex flex-col flex-1 min-h-0" style={{ background: '#F7F3EC' }}>
       <div className="flex-1 overflow-y-auto no-scrollbar" style={{ padding: '12px 14px 14px' }}>
         {/* Search Bar dengan tombol Back */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-          {/* Tombol Back */}
           <button
             onClick={handleBack}
             style={{
@@ -411,7 +258,6 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
             </svg>
           </button>
 
-          {/* Input Search */}
           <div style={{
             flex: 1,
             display: 'flex',
@@ -437,8 +283,23 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
               ref={inputRef}
               type="text"
               value={search}
-              onChange={(e) => handleInputChange(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                if (!e.target.value) {
+                  setSearchResults([]);
+                  setShowHistory(true);
+                  if (searchHistory.length > 0) {
+                    setRecommendedProducts(getProductsByHistory(searchHistory));
+                  } else {
+                    setRecommendedProducts([]);
+                  }
+                } else {
+                  setShowHistory(false);
+                }
+              }}
               onKeyPress={handleKeyPress}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
               placeholder=""
               style={{
                 flex: 1,
@@ -493,148 +354,118 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
           </div>
         </div>
 
-        {/* Search History */}
-        {!search && searchHistory.length > 0 && (
-          <div style={{
-            background: '#fff',
-            borderRadius: 12,
-            border: '1px solid #DED5C3',
-            padding: '8px 0',
-            marginBottom: 14,
-          }}>
+        {/* Search History - Smooth dengan durasi 0.6s */}
+        <div
+          style={{
+            transform: isHistoryVisible ? 'scaleY(1)' : 'scaleY(0)',
+            opacity: isHistoryVisible ? 1 : 0,
+            transformOrigin: 'top center',
+            transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            marginBottom: isHistoryVisible ? 14 : 0,
+            maxHeight: isHistoryVisible ? 500 : 0,
+            overflow: 'hidden',
+          }}
+        >
+          {searchHistory.length > 0 && (
             <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '4px 14px 8px',
-              borderBottom: '1px solid #F0EDE6',
+              background: '#fff',
+              borderRadius: 12,
+              border: '1px solid #DED5C3',
+              padding: '8px 0',
             }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#8A8475' }}>Pencarian Terakhir</span>
-              <button
-                onClick={clearHistory}
-                style={{
-                  fontSize: 10,
-                  color: '#C1543C',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                Hapus Semua
-              </button>
-            </div>
-            {searchHistory.map((item, index) => (
-              <div
-                key={index}
-                onClick={() => handleHistoryClick(item)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  padding: '8px 14px',
-                  cursor: 'pointer',
-                  borderRadius: 6,
-                  transition: 'background 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#F0EDE6';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                }}
-              >
-                <svg width="14" viewBox="0 0 24 24" fill="none" stroke="#8A8475" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <path d="M12 6v6l4 2"/>
-                </svg>
-                <span style={{ fontSize: 12, color: '#232A22' }}>{item}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Search Suggestions - Tampil saat mengetik */}
-        {search && showSuggestions && suggestions.length > 0 && (
-          <div style={{
-            background: '#fff',
-            borderRadius: 12,
-            border: '1px solid #DED5C3',
-            padding: '4px 0',
-            marginBottom: 14,
-          }}>
-            <div style={{
-              padding: '6px 14px 8px',
-              borderBottom: '1px solid #F0EDE6',
-            }}>
-              <span style={{ fontSize: 11, color: '#8A8475' }}>
-                Cari "{search}"
-              </span>
-            </div>
-            {suggestions.map((suggestion, index) => (
-              <div
-                key={index}
-                onClick={() => handleSuggestionClick(suggestion)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  padding: '8px 14px',
-                  cursor: 'pointer',
-                  borderRadius: 6,
-                  transition: 'background 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#F0EDE6';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                }}
-              >
-                <svg width="14" viewBox="0 0 24 24" fill="none" stroke="#8A8475" strokeWidth="2">
-                  <circle cx="11" cy="11" r="7"/>
-                  <path d="M21 21l-4.3-4.3"/>
-                </svg>
-                <span style={{ fontSize: 12, color: '#232A22' }}>{suggestion}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Pencarian Pilihan */}
-        {!search && !searchResults.length && recommendedProducts.length > 0 && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-              <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 14, fontWeight: 600, margin: 0, color: '#2C4533' }}>
-                Pencarian Pilihan
-              </h3>
-              <span style={{ fontSize: 10, color: '#C68B59', fontWeight: 700, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                {recommendedProducts.length} produk
-              </span>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 8 }}>
-              {recommendedProducts.map(p => (
-                <div
-                  key={p.id}
-                  onClick={() => onNavigate(4, { productId: p.id })}
-                  style={{ background: '#fff', border: '1px solid #DED5C3', borderRadius: 12, overflow: 'hidden', cursor: 'pointer' }}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '4px 14px 8px',
+                borderBottom: '1px solid #F0EDE6',
+              }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: '#8A8475' }}>Pencarian Terakhir</span>
+                <button
+                  onClick={clearHistory}
+                  style={{
+                    fontSize: 10,
+                    color: '#C1543C',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
                 >
-                  <div style={{ aspectRatio: '1/1', background: p.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', color: p.iconColor }}>
-                    <div style={{ width: '32%' }}>{productIcons[p.category] ?? productIcons['Pakaian']}</div>
-                  </div>
-                  <div style={{ padding: '6px 8px 8px' }}>
-                    <div style={{ fontSize: 10.5, fontWeight: 600, color: '#232A22', marginBottom: 2, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.3 }}>{p.name}</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#C1543C', fontFamily: "'Fraunces', serif", marginBottom: 3 }}>{formatRupiah(p.price)}</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span style={{ fontSize: 9, color: '#8A8475', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{p.seller}</span>
-                      <span style={{ width: 2, height: 2, borderRadius: '50%', background: '#DED5C3', display: 'block' }}></span>
-                      <span style={{ fontSize: 8, background: '#E7EEE3', color: '#2C4533', fontWeight: 700, borderRadius: 999, padding: '1px 5px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{p.condition}</span>
-                    </div>
-                  </div>
+                  Hapus Semua
+                </button>
+              </div>
+              {searchHistory.map((item, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleHistoryClick(item)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '8px 14px',
+                    cursor: 'pointer',
+                    borderRadius: 6,
+                    transition: 'background 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#F0EDE6';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  <svg width="14" viewBox="0 0 24 24" fill="none" stroke="#8A8475" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                  </svg>
+                  <span style={{ fontSize: 12, color: '#232A22' }}>{item}</span>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
+
+        {/* Pencarian Pilihan - naik/turun smooth dengan durasi 0.6s */}
+        <div
+          style={{
+            transition: 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          }}
+        >
+          {!search && !searchResults.length && recommendedProducts.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+                <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 14, fontWeight: 600, margin: 0, color: '#2C4533' }}>
+                  Pencarian Pilihan
+                </h3>
+                <span style={{ fontSize: 10, color: '#C68B59', fontWeight: 700, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  {recommendedProducts.length} produk
+                </span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 8 }}>
+                {recommendedProducts.map(p => (
+                  <div
+                    key={p.id}
+                    onClick={() => onNavigate(4, { productId: p.id })}
+                    style={{ background: '#fff', border: '1px solid #DED5C3', borderRadius: 12, overflow: 'hidden', cursor: 'pointer' }}
+                  >
+                    <div style={{ aspectRatio: '1/1', background: p.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', color: p.iconColor }}>
+                      <div style={{ width: '32%' }}>{productIcons[p.category] ?? productIcons['Pakaian']}</div>
+                    </div>
+                    <div style={{ padding: '6px 8px 8px' }}>
+                      <div style={{ fontSize: 10.5, fontWeight: 600, color: '#232A22', marginBottom: 2, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.3 }}>{p.name}</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#C1543C', fontFamily: "'Fraunces', serif", marginBottom: 3 }}>{formatRupiah(p.price)}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ fontSize: 9, color: '#8A8475', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{p.seller}</span>
+                        <span style={{ width: 2, height: 2, borderRadius: '50%', background: '#DED5C3', display: 'block' }}></span>
+                        <span style={{ fontSize: 8, background: '#E7EEE3', color: '#2C4533', fontWeight: 700, borderRadius: 999, padding: '1px 5px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{p.condition}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Hasil Pencarian */}
         {searchResults.length > 0 && (
@@ -672,7 +503,7 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
           </div>
         )}
 
-        {search && !showSuggestions && searchResults.length === 0 && (
+        {search && searchResults.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px 20px' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
             <p style={{ fontSize: 14, color: '#8A8475', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -684,7 +515,7 @@ export default function SearchScreen({ onNavigate, searchQuery = '' }: SearchScr
           </div>
         )}
 
-        {!search && searchHistory.length === 0 && searchResults.length === 0 && recommendedProducts.length === 0 && (
+        {!search && !showHistory && searchHistory.length === 0 && searchResults.length === 0 && recommendedProducts.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px 20px' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
             <p style={{ fontSize: 14, color: '#8A8475', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
