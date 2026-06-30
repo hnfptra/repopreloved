@@ -1,0 +1,11 @@
+{
+  "name": "preloved-frontend-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix repopreloved-main run dev --",
+    "build": "npm --prefix repopreloved-main run build",
+    "build:prod": "npm --prefix repopreloved-main run build:prod",
+    "lint": "npm --prefix repopreloved-main run lint",
+    "preview": "npm --prefix repopreloved-main run preview"
+  }
+}
