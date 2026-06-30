@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   ChevronRight,
   Edit3,
@@ -24,13 +25,38 @@ const quickStats = [
   { label: 'Favorit', value: '3', icon: Heart },
 ];
 
-const profileDetails = [
-  { icon: MapPin, label: 'Domisili', value: 'Jakarta, Indonesia' },
+const defaultProfile = {
+  about: 'Penggemar barang preloved berkualitas, suka berburu fashion rapi, dan teliti menjaga detail setiap transaksi.',
+  domicile: 'Jakarta, Indonesia',
+};
+
+const getSavedProfile = () => {
+  try {
+    const raw = localStorage.getItem('preloved-profile');
+    return raw ? { ...defaultProfile, ...JSON.parse(raw) } : defaultProfile;
+  } catch {
+    return defaultProfile;
+  }
+};
+
+const getProfileDetails = (domicile: string) => [
+  { icon: MapPin, label: 'Domisili', value: domicile },
   { icon: Star, label: 'Rating', value: '4.9 dari 32 ulasan' },
   { icon: ShieldCheck, label: 'Status', value: 'Member aktif sejak 2026' },
 ];
 
 export default function Profilsaya({ onNavigate }: ProfilsayaProps) {
+  const [profile, setProfile] = useState(getSavedProfile);
+  const [draftProfile, setDraftProfile] = useState(profile);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const profileDetails = getProfileDetails(profile.domicile);
+
+  const saveProfile = () => {
+    setProfile(draftProfile);
+    localStorage.setItem('preloved-profile', JSON.stringify(draftProfile));
+    setIsEditingProfile(false);
+  };
+
   return (
     <div className="screen-enter flex flex-col flex-1 min-h-0" style={{ background: '#F7F3EC' }}>
       <ScreenHeader title="Profil Saya" onBack={() => onNavigate(8)} />
@@ -210,6 +236,10 @@ export default function Profilsaya({ onNavigate }: ProfilsayaProps) {
             </h2>
             <button
               type="button"
+              onClick={() => {
+                setDraftProfile(profile);
+                setIsEditingProfile(true);
+              }}
               style={{
                 width: 30,
                 height: 30,
@@ -227,9 +257,50 @@ export default function Profilsaya({ onNavigate }: ProfilsayaProps) {
               <Edit3 size={15} strokeWidth={2.2} />
             </button>
           </div>
-          <p style={{ margin: '0 0 12px', color: '#5F665C', fontSize: 12.7, lineHeight: 1.6, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            Penggemar barang preloved berkualitas, suka berburu fashion rapi, dan teliti menjaga detail setiap transaksi.
-          </p>
+          {isEditingProfile ? (
+            <div style={{ marginBottom: 12, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <label style={{ display: 'block', marginBottom: 10 }}>
+                <span style={{ display: 'block', color: '#8A8475', fontSize: 11.5, fontWeight: 700, marginBottom: 5 }}>Deskripsi tentang</span>
+                <textarea
+                  value={draftProfile.about}
+                  onChange={(event) => setDraftProfile((current) => ({ ...current, about: event.target.value }))}
+                  rows={4}
+                  style={{ width: '100%', border: '1px solid #DED5C3', borderRadius: 10, padding: '10px 11px', resize: 'vertical', color: '#232A22', fontSize: 12.5, fontFamily: "'Plus Jakarta Sans', sans-serif", outlineColor: '#2C4533' }}
+                />
+              </label>
+              <label style={{ display: 'block', marginBottom: 10 }}>
+                <span style={{ display: 'block', color: '#8A8475', fontSize: 11.5, fontWeight: 700, marginBottom: 5 }}>Domisili</span>
+                <input
+                  value={draftProfile.domicile}
+                  onChange={(event) => setDraftProfile((current) => ({ ...current, domicile: event.target.value }))}
+                  style={{ width: '100%', border: '1px solid #DED5C3', borderRadius: 10, padding: '10px 11px', color: '#232A22', fontSize: 12.5, fontFamily: "'Plus Jakarta Sans', sans-serif", outlineColor: '#2C4533' }}
+                />
+              </label>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraftProfile(profile);
+                    setIsEditingProfile(false);
+                  }}
+                  style={{ flex: 1, border: '1.5px solid #2C4533', background: '#fff', color: '#2C4533', borderRadius: 999, padding: '10px 0', fontWeight: 800, fontSize: 12.5, fontFamily: "'Plus Jakarta Sans', sans-serif", cursor: 'pointer' }}
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={saveProfile}
+                  style={{ flex: 1, border: 'none', background: '#2C4533', color: '#fff', borderRadius: 999, padding: '10px 0', fontWeight: 800, fontSize: 12.5, fontFamily: "'Plus Jakarta Sans', sans-serif", cursor: 'pointer' }}
+                >
+                  Simpan
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p style={{ margin: '0 0 12px', color: '#5F665C', fontSize: 12.7, lineHeight: 1.6, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              {profile.about}
+            </p>
+          )}
           <div style={{ display: 'grid', gap: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             {profileDetails.map((info) => {
               const Icon = info.icon;
