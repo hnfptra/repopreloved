@@ -10,7 +10,8 @@ import ChatConversationScreen from '../screens/ChatConversationScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import AkunScreen from '../screens/AkunScreen';
 import OrderSuccessScreen from '../screens/OrderSuccessScreen';
-import SearchScreen from '../screens/SearchScreen'; // Import SearchScreen
+import SearchScreen from '../screens/SearchScreen';
+import NotificationScreen from '../screens/NotificationScreen';
 import React from 'react';
 
 type NavigateExtra = { productId?: number; chatId?: number; from?: number; searchQuery?: string };
@@ -52,8 +53,10 @@ export default function Index() {
         return <AkunScreen onNavigate={navigate} />;
       case 10:
         return <OrderSuccessScreen onNavigate={navigate} productId={selectedProductId} />;
-      case 11: // Screen Search
+      case 11:
         return <SearchScreen onNavigate={navigate} searchQuery={searchQuery} />;
+      case 12: // Screen Notifikasi
+        return <NotificationScreen onNavigate={navigate} />;
       default:
         return <SplashScreen onNavigate={navigate} />;
     }

@@ -146,7 +146,7 @@ export const products: Product[] = [
   {
     id: 9,
     name: 'Sandal Kulit Pria',
-    category: 'Sepatu',
+    category: 'Aksesoris',
     price: 98000,
     seller: 'Rudi H.',
     location: 'Depok',

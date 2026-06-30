@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import BottomNav from '../components/preloved/BottomNav';
 import { products, formatRupiah } from '../data/preloved';
+import NotificationBell from '../components/NotificationBell';
 
 type NavigateExtra = { productId?: number; chatId?: number; from?: number };
 
@@ -28,7 +29,6 @@ const cats = ['Semua', 'Pakaian', 'Tas', 'Sepatu', 'Aksesoris'];
 export default function HomeScreen({ onNavigate }: HomeScreenProps) {
   const [activeCategory, setActiveCategory] = useState('Semua');
   const [liked, setLiked] = useState<Set<number>>(new Set());
-  const [searchInput, setSearchInput] = useState('');
 
   const filteredProducts = activeCategory === 'Semua'
     ? products
@@ -41,18 +41,6 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
       if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
-  };
-
-  const handleSearch = () => {
-    if (searchInput.trim()) {
-      onNavigate(11, { searchQuery: searchInput });
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
   };
 
   return (
@@ -83,12 +71,9 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             </svg>
             Cari barang preloved
           </div>
-          <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#fff', border: '1px solid #DED5C3', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#2C4533' }}>
-            <svg viewBox="0 0 24 24" width="15" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 8a6 6 0 1112 0c0 4 1.5 5.5 1.5 6.5H4.5C4.5 13.5 6 12 6 8z"/>
-              <path d="M9.5 18a2.5 2.5 0 005 0"/>
-            </svg>
-          </div>
+          
+          {/* Notification Bell - dengan onNavigate */}
+          <NotificationBell onNavigate={onNavigate} />
         </div>
 
         {/* Banner */}
